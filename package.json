@@ -1,7 +1,7 @@
 {
   "name": "netgear-aircard-rest",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simple REST API to fetch status data and restart / reboot the router",
   "main": "dist/app.js",
   "type": "module",
   "scripts": {
@@ -14,6 +14,9 @@
   },
   "keywords": [],
   "author": "Neil Flatley",
+  "repository": {
+    "url": "https://github.com/neilflatley/netgear-aircard-rest"
+  },
   "license": "MIT",
   "devDependencies": {
     "@swc/cli": "^0.1.63",
