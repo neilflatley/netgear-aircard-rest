@@ -18,11 +18,11 @@ Manually set the router host/ip in `process.env.NETGEAR_HOST` or edit the line `
 
 ## Endpoints
 
-### GET http://<host>:3000/info
+### GET http://{host}:3000/info
 
 No password is required and all the available router data is returned as JSON
 
-### GET http://<host>:3000/login
+### GET http://{host}:3000/login
 
 Set the router admin password in `process.env.NETGEAR_PASSWORD` or edit the line `private password = "MyPassword";` in `src/controller.ts` file.
 
@@ -30,6 +30,6 @@ Returns the available router data as JSON for the logged in user (or Guest if lo
 
 Check the console logs for failure details 
 
-### GET http://<host>:3000/reboot
+### GET http://{host}:3000/reboot
 
 The admin password is required (as above) to reboot the router. You do not need to call the /login endpoint first.
