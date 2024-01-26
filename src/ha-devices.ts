@@ -12,6 +12,7 @@ const device = (json: any) => ({
 export default (json: any) => ({
   connected: {
     unique_id: "netgear_aircard_connected",
+    object_id: "netgear_aircard_connected",
     state_topic: "netgear_aircard/attribute",
     value_template: "{{ value_json.wwan.connection }}",
     availability: {
@@ -26,6 +27,7 @@ export default (json: any) => ({
   },
   data_usage: {
     unique_id: "netgear_aircard_data_usage",
+    object_id: "netgear_aircard_data_usage",
     state_topic: "netgear_aircard/attribute",
     value_template: "{{ value_json.wwan.dataUsage.generic.dataTransferred }}",
     device_class: "data_size",

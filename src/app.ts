@@ -35,7 +35,8 @@ server.get("/info", async (request, reply) => {
   try {
     await netgear.refresh();
 
-    if (!mqtt.client) await mqtt.init(netgear.status);
+    if (netgear.user_role === "Admin" && !mqtt.client)
+      await mqtt.init(netgear.status);
     if (mqtt.client) await mqtt.publish(JSON.stringify(netgear.status));
 
     reply.type("application/json").code(200);
