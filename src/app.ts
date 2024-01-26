@@ -1,12 +1,15 @@
 import Fastify, { FastifyInstance } from "fastify";
 import NetgearRouter from "netgear";
 import NetgearController from "./controller.js";
+import Mqtt from "./mqtt.js";
 
 // note: options can be passed in here. See login options.
 const router = new NetgearRouter();
 
 // discover a netgear router, including IP address and SOAP port. The discovered address and SOAP port will override previous settings
 let discoveredHost = undefined;
+
+const mqtt = new Mqtt();
 
 router
   .discover()
@@ -31,6 +34,9 @@ server.get("/ping", async (request, reply) => {
 server.get("/info", async (request, reply) => {
   try {
     await netgear.refresh();
+
+    if (!mqtt.client) await mqtt.init(netgear.status);
+    if (mqtt.client) await mqtt.publish(JSON.stringify(netgear.status));
 
     reply.type("application/json").code(200);
     return netgear.status;
@@ -72,7 +78,7 @@ server.get("/reboot", async (request, reply) => {
 
 const start = async () => {
   try {
-    await server.listen({ port: 3000 });
+    await server.listen({ port: 3000, host: "0.0.0.0" });
   } catch (err) {
     server.log.error(err);
     process.exit(1);

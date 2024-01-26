@@ -33,6 +33,7 @@
     "await-to-js": "^3.0.0",
     "cross-env": "^7.0.3",
     "fastify": "^4.24.3",
+    "mqtt": "^5.3.5",
     "netgear": "^4.4.3",
     "request": "^2.88.2",
     "tsx": "^4.6.2"
