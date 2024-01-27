@@ -46,7 +46,9 @@ export default (json: any) =>
               unique_id: "netgear_aircard_connected",
               object_id: "netgear_aircard_connected",
               state_topic: "netgear_aircard/attribute",
-              value_template: "{{ value_json.wwan.connection == 'Connected' }}",
+              value_template: "{{ value_json.wwan.connection }}",
+              payload_on: "Connected",
+              payload_off: "Disconnected",
               device_class: "connectivity",
               availability: {
                 topic: "netgear_aircard/attribute",
@@ -64,19 +66,9 @@ export default (json: any) =>
               state_topic: "netgear_aircard/attribute",
               value_template:
                 "{{ value_json.power.battChargeSource == 'Charger' }}",
+              payload_on: "Charger",
+              payload_off: "Battery",
               device_class: "battery_charging",
-            },
-          ],
-          number: [
-            {
-              name: "Connected clients",
-              unique_id: "netgear_aircard_connected_clients",
-              object_id: "netgear_aircard_connected_clients",
-              state_topic: "netgear_aircard/attribute",
-              value_template: "{{ value_json.wifi.clientCount | int }}",
-              icon: "mdi:wifi-star",
-              json_attributes_topic: "netgear_aircard/attribute",
-              json_attributes_template: "{{ value_json.wifi | tojson }}",
             },
           ],
           sensor: [
@@ -88,6 +80,16 @@ export default (json: any) =>
               value_template: "{{ value_json.power.battChargeLevel }}",
               device_class: "battery",
               unit_of_measurement: "%",
+            },
+            {
+              name: "Connected clients",
+              unique_id: "netgear_aircard_connected_clients",
+              object_id: "netgear_aircard_connected_clients",
+              state_topic: "netgear_aircard/attribute",
+              value_template: "{{ value_json.wifi.clientCount | int }}",
+              icon: "mdi:wifi-star",
+              json_attributes_topic: "netgear_aircard/attribute",
+              json_attributes_template: "{{ value_json.wifi | tojson }}",
             },
             {
               name: "Connection text",
@@ -133,7 +135,6 @@ export default (json: any) =>
               object_id: "netgear_aircard_signal",
               state_topic: "netgear_aircard/attribute",
               value_template: "{{ value_json.wwan.signalStrength.bars }}",
-              device_class: "signal_strength",
               icon: "mdi:signal",
               json_attributes_topic: "netgear_aircard/attribute",
               json_attributes_template:
