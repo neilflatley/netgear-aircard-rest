@@ -1,6 +1,7 @@
 import { to } from "await-to-js";
 import request from "request";
 import util from "util";
+import Mqtt from "./mqtt";
 
 const post = util.promisify(request.post);
 const get = util.promisify(request.get);
@@ -9,6 +10,8 @@ class NetgearController {
   private jar = request.jar(); // Cookie jar
   private get = (arg: Parameters<typeof get>[0]) => to(get(arg));
   private post = (arg: Parameters<typeof post>[0]) => to(post(arg));
+
+  mqtt = new Mqtt();
 
   private host = "netgear.aircard";
   private password = "MyPassword";
@@ -29,11 +32,19 @@ class NetgearController {
     host = process.env.NETGEAR_HOST,
     password = process.env.NETGEAR_PASSWORD
   ) {
-    this.password = password;
+    if (password) this.password = password;
     this.host = host || this.host;
     this.routerUri = `http://${this.host}`;
     console.log(`Connecting to ${this.routerUri}`);
   }
+
+  publish = async () => {
+    // requires process.env.MQTT_HOST set otherwise this safely does nothing
+    const { mqtt, status, user_role } = this;
+
+    if (user_role === "Admin" && !mqtt.client) await mqtt.init();
+    if (mqtt.client) await mqtt.publish(JSON.stringify(status));
+  };
 
   refresh = async () => {
     const [err, res] = await this.get({
