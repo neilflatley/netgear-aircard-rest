@@ -18,8 +18,8 @@ class Mqtt {
   };
 
   discovery = async (json = this.status) => {
-    for (const [component, sensors] of Object.entries(devices(json))) {
-      for (const [, device] of Object.entries(sensors)) {
+    for (const [component, sensors] of Object.entries(devices(json) || {})) {
+      for (const device of sensors) {
         await this.client?.publishAsync(
           `homeassistant/${component}/${device.unique_id}/config`,
           JSON.stringify(device)
@@ -29,9 +29,11 @@ class Mqtt {
   };
 
   publish = async (message: string, topic = "netgear_aircard/attribute") => {
-    await this.client?.publishAsync(topic, message);
-    this.count++;
-    if (this.count % 10 > 0) await this.discovery();
+    if (this.client) {
+      await this.client.publishAsync(topic, message);
+      this.count++;
+      if (this.count % 10 > 0) await this.discovery();
+    }
   };
 }
 
