@@ -3,7 +3,7 @@ const device = (json: any) => ({
   name: json.general.deviceName,
   manufacturer: json.general.manufacturer,
   model: json.general.model,
-  serial_number: json.general.FSN,
+  // serial_number: json.general.FSN,
   hw_version: json.general.HWversion,
   sw_version: `${json.general.FWversion} ${json.general.buildDate}`,
   configuration_url: `http://${json.router.gatewayIP}`,
