@@ -9,8 +9,6 @@ const router = new NetgearRouter();
 // discover a netgear router, including IP address and SOAP port. The discovered address and SOAP port will override previous settings
 let discoveredHost = undefined;
 
-const mqtt = new Mqtt();
-
 router
   .discover()
   .then((discovered) => {
@@ -34,10 +32,7 @@ server.get("/ping", async (request, reply) => {
 server.get("/info", async (request, reply) => {
   try {
     await netgear.refresh();
-
-    if (netgear.user_role === "Admin" && !mqtt.client)
-      await mqtt.init(netgear.status);
-    if (mqtt.client) await mqtt.publish(JSON.stringify(netgear.status));
+    netgear.publish();
 
     reply.type("application/json").code(200);
     return netgear.status;
@@ -52,6 +47,7 @@ server.get("/info", async (request, reply) => {
 server.get("/login", async (request, reply) => {
   try {
     await netgear.login();
+    netgear.publish();
 
     reply.type("application/json").code(200);
     return netgear.status;
@@ -97,7 +93,10 @@ server.post<{ Body: { reboot: "ok" } }>(
         await netgear.reboot();
         reply.type("application/json").code(200);
         return { reboot: "ok" };
-      } else return;
+      } else {
+        netgear.publish();
+        return;
+      }
     } catch (error) {
       console.log(error);
 
