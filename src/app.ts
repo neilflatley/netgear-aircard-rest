@@ -77,6 +77,36 @@ server.get("/reboot", async (request, reply) => {
   }
 });
 
+server.post<{ Body: { reboot: "ok" } }>(
+  "/reboot",
+  {
+    schema: {
+      body: {
+        type: "object",
+        required: ["reboot"],
+        properties: {
+          reboot: { type: "string" },
+        },
+      },
+    },
+  },
+  async (request, reply) => {
+    try {
+      if (request.body.reboot === "ok") {
+        console.log("going to reboot the router now");
+        await netgear.reboot();
+        reply.type("application/json").code(200);
+        return { reboot: "ok" };
+      } else return;
+    } catch (error) {
+      console.log(error);
+
+      reply.type("application/json").code(500);
+      return { reboot: "error", error };
+    }
+  }
+);
+
 const start = async () => {
   try {
     await server.listen({ port: 3000, host: "0.0.0.0" });
