@@ -2,7 +2,7 @@ import { MqttClient, connectAsync } from "mqtt";
 import devices from "./ha-devices.js";
 
 class Mqtt {
-  client!: MqttClient;
+  count = 0;
 
   init = async (json: any) => {
     const client = process.env.MQTT_HOST
@@ -22,7 +22,7 @@ class Mqtt {
   };
 
   publish = async (message: string, topic = "netgear_aircard/attribute") => {
-    await this.client.publishAsync(topic, message);
+    this.count++;
   };
 }
 
