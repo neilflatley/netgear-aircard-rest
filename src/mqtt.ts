@@ -25,7 +25,7 @@ class Mqtt {
     for (const [component, sensors] of Object.entries(devices(json) || {})) {
       for (const device of sensors) {
         await this.client?.publishAsync(
-          `homeassistant/${component}/${device.unique_id}/config`,
+          `homeassistant/${component}/netgear_aircard/${device.unique_id}/config`,
           JSON.stringify(device)
         );
         count++;
