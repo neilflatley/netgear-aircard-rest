@@ -7,13 +7,14 @@ class Mqtt {
   host = process.env.MQTT_HOST;
   status: any;
 
-  init = async () => {
+  init = async (status: any) => {
     if (!this.client && this.host) {
       const client = await connectAsync(this.host);
 
       if (client) {
         this.client = client;
         console.log(`[mqtt] connected client ${this.host}`);
+        this.status = status;
       }
     }
     return this;
@@ -36,11 +37,10 @@ class Mqtt {
   publish = async (message: string, topic = "netgear_aircard/attribute") => {
     if (this.client) {
       await this.client.publishAsync(topic, message);
+      if (this.count % 10 === 0) await this.discovery();
       this.count++;
-      if (this.count % 10 > 0) await this.discovery();
     }
     console.log(`[mqtt] published ${this.count} status messages`)
-    console.log(`[mqtt] this.count % 10 ${this.count % 10}`)
   };
 }
 

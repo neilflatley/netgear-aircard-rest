@@ -42,7 +42,7 @@ class NetgearController {
     // requires process.env.MQTT_HOST set otherwise this safely does nothing
     const { mqtt, status, user_role } = this;
 
-    if (user_role === "Admin" && !mqtt.client) await mqtt.init();
+    if (user_role === "Admin" && !mqtt.client) await mqtt.init(status);
     if (mqtt.client) await mqtt.publish(JSON.stringify(status));
   };
 
