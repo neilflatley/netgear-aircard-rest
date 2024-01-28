@@ -119,6 +119,14 @@ export default (json: any) =>
               unit_of_measurement: "GiB",
             },
             {
+              name: "Network",
+              unique_id: "netgear_aircard_connected_network",
+              object_id: "netgear_aircard_connected_network",
+              state_topic: "netgear_aircard/attribute",
+              value_template: "{{ value_json.wwan.registerNetworkDisplay }}",
+              icon: "mdi:signal-variant",
+            },
+            {
               name: "Router",
               unique_id: "netgear_aircard_router",
               object_id: "netgear_aircard_router",
@@ -127,6 +135,23 @@ export default (json: any) =>
               icon: "mdi:router-wireless-settings",
               json_attributes_topic: "netgear_aircard/attribute",
               json_attributes_template: "{{ value_json.router | tojson }}",
+            },
+            {
+              name: "RSSI",
+              unique_id: "netgear_aircard_signal_strength",
+              object_id: "netgear_aircard_signal_strength",
+              state_topic: "netgear_aircard/attribute",
+              value_template: "{{ value_json.wwan.signalStrength.rssi }}",
+              device_class: "signal_strength",
+              unit_of_measurement: "dBm",
+            },
+            {
+              name: "Service type",
+              unique_id: "netgear_aircard_service_type",
+              object_id: "netgear_aircard_service_type",
+              state_topic: "netgear_aircard/attribute",
+              value_template: "{{ value_json.wwan.currentPSserviceType }}",
+              icon: "mdi:radio-tower",
             },
             {
               name: "Signal",
@@ -150,15 +175,6 @@ export default (json: any) =>
               icon: "mdi:clock",
             },
             {
-              name: "RSSI",
-              unique_id: "netgear_aircard_signal_strength",
-              object_id: "netgear_aircard_signal_strength",
-              state_topic: "netgear_aircard/attribute",
-              value_template: "{{ value_json.wwan.signalStrength.rssi }}",
-              device_class: "signal_strength",
-              unit_of_measurement: "dBm",
-            },
-            {
               name: "Uptime",
               unique_id: "netgear_aircard_uptime",
               object_id: "netgear_aircard_uptime",
@@ -166,6 +182,14 @@ export default (json: any) =>
               value_template:
                 "{{ (as_timestamp(now()) - value_json.wwan.sessDuration) | as_datetime | as_local | relative_time }}",
               icon: "mdi:checkbox-marked-circle-outline",
+            },
+            {
+              name: "WAN IP",
+              unique_id: "netgear_aircard_wan_ip",
+              object_id: "netgear_aircard_wan_ip",
+              state_topic: "netgear_aircard/attribute",
+              value_template: "{{ value_json.wwan.IP }}",
+              icon: "mdi:ip",
             },
             {
               name: "WWAN band",
