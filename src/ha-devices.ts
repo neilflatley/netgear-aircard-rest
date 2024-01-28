@@ -64,8 +64,7 @@ export default (json: any) =>
               unique_id: "netgear_aircard_charging",
               object_id: "netgear_aircard_charging",
               state_topic: "netgear_aircard/attribute",
-              value_template:
-                "{{ value_json.power.battChargeSource == 'Charger' }}",
+              value_template: "{{ value_json.power.battChargeSource }}",
               payload_on: "Charger",
               payload_off: "Battery",
               device_class: "battery_charging",
@@ -115,7 +114,7 @@ export default (json: any) =>
               object_id: "netgear_aircard_data_usage_gb",
               state_topic: "netgear_aircard/attribute",
               value_template:
-                "{{ value_json.wwan.dataUsage.generic.dataTransferred / 1073741824 | round(3) }}",
+                "{{ (value_json.wwan.dataUsage.generic.dataTransferred / 1073741824) | round(3) }}",
               device_class: "data_size",
               unit_of_measurement: "GiB",
             },
