@@ -140,6 +140,16 @@ export default (json: any) =>
                 "{{ value_json.wwan.signalStrength | tojson }}",
             },
             {
+              name: "Started",
+              unique_id: "netgear_aircard_started",
+              object_id: "netgear_aircard_started",
+              state_topic: "netgear_aircard/attribute",
+              value_template:
+                "{{ (as_timestamp(now()) | round(0) - value_json.wwan.sessDuration) | as_datetime }}",
+              device_class: "timestamp",
+              icon: "mdi:clock",
+            },
+            {
               name: "RSSI",
               unique_id: "netgear_aircard_signal_strength",
               object_id: "netgear_aircard_signal_strength",
@@ -147,6 +157,15 @@ export default (json: any) =>
               value_template: "{{ value_json.wwan.signalStrength.rssi }}",
               device_class: "signal_strength",
               unit_of_measurement: "dBm",
+            },
+            {
+              name: "Uptime",
+              unique_id: "netgear_aircard_uptime",
+              object_id: "netgear_aircard_uptime",
+              state_topic: "netgear_aircard/attribute",
+              value_template:
+                "{{ (as_timestamp(now()) - value_json.wwan.sessDuration) | as_datetime | as_local | relative_time }}",
+              icon: "mdi:checkbox-marked-circle-outline",
             },
             {
               name: "WWAN band",
