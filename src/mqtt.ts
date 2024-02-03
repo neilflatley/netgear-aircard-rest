@@ -7,7 +7,7 @@ export class Mqtt {
   count = 0;
   host = process.env.MQTT_HOST;
   status: any;
-  sms?: ISmsController;
+  sms!: ISmsController;
 
   init = async (status: NetgearStatus, sms: ISmsController) => {
     this.status = status;
@@ -18,6 +18,7 @@ export class Mqtt {
       if (client) {
         this.client = client;
         console.log(`[mqtt] connected client ${this.host}`);
+        await this.discovery();
         this.birth();
       }
     }
@@ -26,7 +27,6 @@ export class Mqtt {
 
   birth = () => {
     if (!this.client || !this.sms) return;
-    this.discovery();
     this.client.on("end", () => {
       this.client = undefined;
     });
@@ -40,9 +40,6 @@ export class Mqtt {
         if (payload.toString() === "online") this.discovery();
       }
     });
-    // publish ha status topics
-    this.client.publish(`netgear_aircard/sms/recipient`, this.sms.to);
-    this.client.publish(`netgear_aircard/sms/message`, this.sms.msg);
     // subscribe to ha device command topics
     this.client.subscribe([
       `netgear_aircard/command`,
@@ -50,34 +47,38 @@ export class Mqtt {
       `netgear_aircard/sms/message`,
     ]);
     this.client.on("message", (t, payload) => {
-      if (this.sms) {
-        if (t === `netgear_aircard/sms/recipient`) {
-          console.log(
-            `[mqtt] received payload '${payload}' from homeassistant/sms/recipient`
-          );
-          this.sms.to = payload.toString();
-        }
-        if (t === `netgear_aircard/sms/message`) {
-          console.log(
-            `[mqtt] received payload '${payload}' from homeassistant/sms/message`
-          );
-          this.sms.msg = payload.toString();
-        }
-        if (t === `netgear_aircard/command`) {
-          if (payload.toString() === "send_sms") this.sms.sendSms();
-          if (payload.toString() === "restart") this.sms.reboot();
-        }
+      if (!this.sms) return;
+      if (t === `netgear_aircard/sms/recipient`) {
+        console.log(
+          `[mqtt] received payload '${payload}' from homeassistant/sms/recipient`
+        );
+        this.sms.to = payload.toString();
+      }
+      if (t === `netgear_aircard/sms/message`) {
+        console.log(
+          `[mqtt] received payload '${payload}' from homeassistant/sms/message`
+        );
+        this.sms.msg = payload.toString();
+      }
+      if (t === `netgear_aircard/command`) {
+        if (payload.toString() === "send_sms") this.sms.sendSms();
+        if (payload.toString() === "restart") this.sms.reboot();
       }
     });
   };
 
   discovery = async (json = this.status) => {
+    // publish ha status topics
+    await this.publish(this.sms.to, `netgear_aircard/sms/recipient`);
+    await this.publish(this.sms.msg, `netgear_aircard/sms/message`);
+
+    // publish mqtt discovery devices
     let count = 0;
     for (const [component, sensors] of Object.entries(devices(json) || {})) {
       for (const device of sensors) {
-        await this.client?.publishAsync(
-          `homeassistant/${component}/netgear_aircard/${device.unique_id}/config`,
-          JSON.stringify(device)
+        await this.publish(
+          JSON.stringify(device),
+          `homeassistant/${component}/netgear_aircard/${device.unique_id}/config`
         );
         count++;
       }

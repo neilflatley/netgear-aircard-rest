@@ -67,12 +67,15 @@ export default (json: any) =>
               payload_on: "Charger",
               payload_off: "Battery",
               device_class: "battery_charging",
+              entity_category: "diagnostic",
             },
             {
               name: "Unread SMS",
               unique_id: "netgear_aircard_unread_sms",
               object_id: "netgear_aircard_unread_sms",
-              value_template: "{{ iif(value_json.sms.unreadMsgs > 0, 'on', 'off', 'unknown') }}",
+              value_template: "{{ value_json.sms.unreadMsgs > 0 }}",
+              payload_on: true,
+              payload_off: false,
               availability: {
                 topic: "netgear_aircard/attribute",
                 value_template: "{{ value_json.sms.ready }}",
@@ -120,6 +123,7 @@ export default (json: any) =>
               value_template: "{{ value_json.power.battChargeLevel }}",
               device_class: "battery",
               unit_of_measurement: "%",
+              entity_category: "diagnostic",
             },
             {
               name: "Connected clients",
@@ -147,6 +151,7 @@ export default (json: any) =>
                 "{{ value_json.wwan.dataUsage.generic.dataTransferred }}",
               device_class: "data_size",
               unit_of_measurement: "B",
+              entity_category: "diagnostic",
             },
             {
               name: "Data used (GiB)",
@@ -173,7 +178,7 @@ export default (json: any) =>
               icon: "mdi:router-wireless-settings",
               json_attributes_topic: "netgear_aircard/attribute",
               json_attributes_template: "{{ value_json.router | tojson }}",
-              entity_category: "config",
+              entity_category: "diagnostic",
             },
             {
               name: "RSSI",
@@ -183,6 +188,7 @@ export default (json: any) =>
               value_template: "{{ value_json.wwan.signalStrength.rssi }}",
               device_class: "signal_strength",
               unit_of_measurement: "dBm",
+              entity_category: "diagnostic",
             },
             {
               name: "Service type",
@@ -210,6 +216,7 @@ export default (json: any) =>
                 "{{ (as_timestamp(now()) | round(0) - value_json.wwan.sessDuration) | as_datetime }}",
               device_class: "timestamp",
               icon: "mdi:clock",
+              entity_category: "diagnostic",
             },
             {
               name: "WAN IP",
@@ -217,7 +224,7 @@ export default (json: any) =>
               object_id: "netgear_aircard_wan_ip",
               value_template: "{{ value_json.wwan.IP }}",
               icon: "mdi:ip",
-              entity_category: "config",
+              entity_category: "diagnostic",
             },
             {
               name: "WWAN band",
@@ -227,6 +234,7 @@ export default (json: any) =>
               icon: "mdi:radio-tower",
               json_attributes_topic: "netgear_aircard/attribute",
               json_attributes_template: "{{ value_json.wwanadv | tojson }}",
+              entity_category: "diagnostic",
             },
           ],
           text: [
