@@ -25,13 +25,14 @@ export class Mqtt {
   };
 
   birth = () => {
+    if (!this.client || !this.sms) return;
     this.discovery();
-    this.client?.on("end", () => {
+    this.client.on("end", () => {
       this.client = undefined;
     });
     // subscribe to ha birth message and republish discovery messages
-    this.client?.subscribe([`homeassistant/status`]);
-    this.client?.on("message", (t, payload) => {
+    this.client.subscribe([`homeassistant/status`]);
+    this.client.on("message", (t, payload) => {
       if (t === `homeassistant/status`) {
         console.log(
           `[mqtt] received payload '${payload}' from homeassistant/status`
@@ -39,13 +40,16 @@ export class Mqtt {
         if (payload.toString() === "online") this.discovery();
       }
     });
+    // publish ha status topics
+    this.client.publish(`netgear_aircard/sms/recipient`, this.sms.to);
+    this.client.publish(`netgear_aircard/sms/message`, this.sms.msg);
     // subscribe to ha device command topics
-    this.client?.subscribe([
+    this.client.subscribe([
       `netgear_aircard/command`,
       `netgear_aircard/sms/recipient`,
       `netgear_aircard/sms/message`,
     ]);
-    this.client?.on("message", (t, payload) => {
+    this.client.on("message", (t, payload) => {
       if (this.sms) {
         if (t === `netgear_aircard/sms/recipient`) {
           console.log(

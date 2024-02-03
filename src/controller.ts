@@ -43,8 +43,15 @@ class NetgearController implements ISmsController {
   private message = "";
   private recipient = "";
 
+  get msg() {
+    return this.message || this.status.sms.sendMsg?.[0].text || "";
+  }
   set msg(value: string) {
     this.message = value;
+  }
+
+  get to() {
+    return this.recipient || this.status.sms.sendMsg?.[0].receiver || "";
   }
   set to(value: string) {
     this.recipient = value;

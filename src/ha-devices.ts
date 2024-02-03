@@ -72,7 +72,7 @@ export default (json: any) =>
               name: "Unread SMS",
               unique_id: "netgear_aircard_unread_sms",
               object_id: "netgear_aircard_unread_sms",
-              value_template: "{{ value_json.sms.unreadMsgs > 0 }}",
+              value_template: "{{ iif(value_json.sms.unreadMsgs > 0, 'on', 'off', 'unknown') }}",
               availability: {
                 topic: "netgear_aircard/attribute",
                 value_template: "{{ value_json.sms.ready }}",
@@ -108,7 +108,7 @@ export default (json: any) =>
               },
               command_topic: "netgear_aircard/command",
               payload_press: "send_sms",
-              icon: "mdi:message-question",
+              icon: "mdi:message-plus",
             },
           ],
           sensor: [
@@ -173,6 +173,7 @@ export default (json: any) =>
               icon: "mdi:router-wireless-settings",
               json_attributes_topic: "netgear_aircard/attribute",
               json_attributes_template: "{{ value_json.router | tojson }}",
+              entity_category: "config",
             },
             {
               name: "RSSI",
@@ -216,6 +217,7 @@ export default (json: any) =>
               object_id: "netgear_aircard_wan_ip",
               value_template: "{{ value_json.wwan.IP }}",
               icon: "mdi:ip",
+              entity_category: "config",
             },
             {
               name: "WWAN band",
@@ -233,6 +235,7 @@ export default (json: any) =>
               unique_id: "netgear_aircard_sms_message",
               object_id: "netgear_aircard_sms_message",
               command_topic: "netgear_aircard/sms/message",
+              state_topic : "netgear_aircard/sms/message",
               icon: "mdi:message-text",
             },
             {
@@ -240,6 +243,7 @@ export default (json: any) =>
               unique_id: "netgear_aircard_sms_recipient",
               object_id: "netgear_aircard_sms_recipient",
               command_topic: "netgear_aircard/sms/recipient",
+              state_topic : "netgear_aircard/sms/recipient",
               icon: "mdi:message-question",
             },
           ],
