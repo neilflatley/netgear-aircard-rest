@@ -43,6 +43,7 @@ export default (json: any) =>
         Object.entries({
           binary_sensor: [
             {
+              name: "Connectivity",
               unique_id: "netgear_aircard_connected",
               object_id: "netgear_aircard_connected",
               value_template: "{{ value_json.wwan.connection }}",
@@ -68,13 +69,13 @@ export default (json: any) =>
               device_class: "battery_charging",
             },
             {
+              name: "Unread SMS",
               unique_id: "netgear_aircard_unread_sms",
               object_id: "netgear_aircard_unread_sms",
               value_template: "{{ value_json.sms.unreadMsgs > 0 }}",
               availability: {
                 topic: "netgear_aircard/attribute",
                 value_template: "{{ value_json.sms.ready }}",
-                payload_available: "true",
               },
               json_attributes_topic: "netgear_aircard/attribute",
               json_attributes_template: "{{ value_json.sms | tojson }}",
@@ -102,7 +103,6 @@ export default (json: any) =>
               availability: {
                 topic: "netgear_aircard/attribute",
                 value_template: "{{ value_json.sms.sendEnabled }}",
-                payload_available: "true",
               },
               command_topic: "netgear_aircard/command",
               payload_press: "send_sms",
