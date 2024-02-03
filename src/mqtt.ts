@@ -15,13 +15,18 @@ export class Mqtt {
       if (client) {
         this.client = client;
         console.log(`[mqtt] connected client ${this.host}`);
-        this.birth(); // subscribe to ha birth message and republish discovery messages
+        this.birth();
       }
     }
     return this;
   };
 
   birth = () => {
+    this.discovery();
+    this.client?.on("end", () => {
+      this.client = undefined;
+    });
+    // subscribe to ha birth message and republish discovery messages
     this.client?.subscribe(`homeassistant/status`);
     this.client?.on("message", (t, payload) => {
       if (t === `homeassistant/status`) {
@@ -31,7 +36,6 @@ export class Mqtt {
         if (payload.toString() === "online") this.discovery();
       }
     });
-    this.discovery();
   };
 
   discovery = async (json = this.status) => {
@@ -46,14 +50,18 @@ export class Mqtt {
       }
     }
     if (count) console.log(`[mqtt] published ${count} discovery messages`);
-    this.publish(JSON.stringify(json));
+    setTimeout(() => {
+      this.publish(JSON.stringify(json));
+    }, 5000);
   };
 
   publish = async (message: string, topic = "netgear_aircard/attribute") => {
     if (this.client) {
       await this.client.publishAsync(topic, message);
       // if (this.count % 10 === 0) await this.discovery();
-      console.log(`[mqtt] published ${this.count++} status messages since startup`);
+      console.log(
+        `[mqtt] published ${++this.count} status messages since startup`
+      );
     }
   };
 }
