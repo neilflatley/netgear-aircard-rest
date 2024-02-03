@@ -76,6 +76,7 @@ export default (json: any) =>
               availability: {
                 topic: "netgear_aircard/attribute",
                 value_template: "{{ value_json.sms.ready }}",
+                payload_available: true,
               },
               json_attributes_topic: "netgear_aircard/attribute",
               json_attributes_template: "{{ value_json.sms | tojson }}",
@@ -103,6 +104,7 @@ export default (json: any) =>
               availability: {
                 topic: "netgear_aircard/attribute",
                 value_template: "{{ value_json.sms.sendEnabled }}",
+                payload_available: true,
               },
               command_topic: "netgear_aircard/command",
               payload_press: "send_sms",
