@@ -46,7 +46,7 @@ class NetgearController {
     return `${this.routerUri}/Forms/config`;
   }
 
-  status = null; // Status doc
+  status!: NetgearStatus; // Status doc
   token = null; // Token to connect to router
   user_role = null;
 
