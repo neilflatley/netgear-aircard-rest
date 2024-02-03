@@ -13,6 +13,8 @@ router
     console.log(discovered);
     netgear.login().then(() => {
       netgear.publish();
+    }, (err)=> {
+      console.log(`Discovery error: ${err}`)
     });
   })
   .catch((error) => console.log(error));
