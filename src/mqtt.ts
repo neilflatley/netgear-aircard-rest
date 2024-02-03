@@ -1,7 +1,7 @@
 import { MqttClient, connectAsync } from "mqtt";
 import devices from "./ha-devices.js";
 
-class Mqtt {
+export class Mqtt {
   client?: MqttClient;
   count = 0;
   host = process.env.MQTT_HOST;
@@ -15,9 +15,22 @@ class Mqtt {
         this.client = client;
         console.log(`[mqtt] connected client ${this.host}`);
         this.status = status;
+        this.birth(); // subscribe to ha birth message and republish discovery messages
       }
     }
     return this;
+  };
+
+  birth = () => {
+    this.client?.subscribe(`homeassistant/status`);
+    this.client?.on("message", async (t, payload) => {
+      if (t === `homeassistant/status`) {
+        console.log(
+          `[mqtt] received payload '${payload}' from homeassistant/status`
+        );
+        if (payload.toString() === "online") await this.discovery();
+      }
+    });
   };
 
   discovery = async (json = this.status) => {
@@ -31,7 +44,7 @@ class Mqtt {
         count++;
       }
     }
-    if (count) console.log(`[mqtt] published ${count} discovery messages`)
+    if (count) console.log(`[mqtt] published ${count} discovery messages`);
   };
 
   publish = async (message: string, topic = "netgear_aircard/attribute") => {
@@ -40,8 +53,8 @@ class Mqtt {
       if (this.count % 10 === 0) await this.discovery();
       this.count++;
     }
-    console.log(`[mqtt] published ${this.count} status messages`)
+    console.log(`[mqtt] published ${this.count} status messages since startup`);
   };
 }
 
-export default Mqtt;
+export const mqtt = new Mqtt();

@@ -1,20 +1,19 @@
 import Fastify, { FastifyInstance } from "fastify";
 import NetgearRouter from "netgear";
 import NetgearController from "./controller.js";
-import Mqtt from "./mqtt.js";
 
 // note: options can be passed in here. See login options.
 const router = new NetgearRouter();
 
-// discover a netgear router, including IP address and SOAP port. The discovered address and SOAP port will override previous settings
-let discoveredHost = undefined;
-
+// discover a netgear router, including IP address. The discovered address will override previous settings
 router
   .discover()
   .then((discovered) => {
-    discoveredHost = discovered.host;
     netgear = new NetgearController(discovered.host);
     console.log(discovered);
+    netgear.login().then(() => {
+      netgear.publish();
+    });
   })
   .catch((error) => console.log(error));
 
