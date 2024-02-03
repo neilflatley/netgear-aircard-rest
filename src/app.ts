@@ -89,6 +89,54 @@ server.post<{ Body: { reboot: "ok" } }>(
   }
 );
 
+server.get("/sms", async (request, reply) => {
+  try {
+    await netgear.readSms();
+    netgear.publish();
+
+    reply.type("application/json").code(200);
+    return netgear.status.sms;
+  } catch (error) {
+    console.log(error);
+
+    reply.type("application/json").code(500);
+    return { sms: "error", error };
+  }
+});
+
+server.post<{ Body: { message: string; recipient: string } }>(
+  "/sms",
+  {
+    schema: {
+      body: {
+        type: "object",
+        required: ["recipient", "message"],
+        properties: {
+          message: { type: "string" },
+          recipient: { type: "string" },
+        },
+      },
+    },
+  },
+  async (request, reply) => {
+    try {
+      const { message, recipient } = request.body;
+      if (recipient && message) {
+        await netgear.sendSms({ message, recipient });
+        reply.type("application/json").code(200);
+        return { sms: "ok", recipient, message };
+      } else {
+        netgear.publish();
+        return;
+      }
+    } catch (error) {
+      console.log(error);
+
+      reply.type("application/json").code(500);
+      return { sms: "error", error };
+    }
+  }
+);
 const start = async () => {
   try {
     await server.listen({ port: 3000, host: "0.0.0.0" });

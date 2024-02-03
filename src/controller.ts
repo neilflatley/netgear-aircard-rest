@@ -45,6 +45,9 @@ class NetgearController {
   get config_uri() {
     return `${this.routerUri}/Forms/config`;
   }
+  get send_sms_uri() {
+    return `${this.routerUri}/Forms/smsSendMsg`;
+  }
 
   status!: NetgearStatus; // Status doc
   token = null; // Token to connect to router
@@ -122,6 +125,56 @@ class NetgearController {
       if (err) throw err;
       if (res.statusCode > 200 && res.statusCode < 400)
         console.log("Restarting router...");
+    }
+  };
+
+  readSms = async () => {
+    if (this.user_role !== "Admin") {
+      await this.login();
+    }
+    if (this.user_role !== "Admin") {
+      throw new Error(
+        `Cannot read sms unless user_role is Admin - user_role: ${this.user_role}`
+      );
+    } else {
+      return this.status?.sms;
+    }
+  };
+
+  sendSms = async ({
+    message = this.message,
+    recipient = this.recipient,
+  }: {
+    message?: string;
+    recipient?: string;
+  } = {}) => {
+    console.log(`[sms] send ${recipient} "${message}"`);
+    if (this.user_role !== "Admin") {
+      await this.login();
+    }
+    if (this.user_role !== "Admin") {
+      throw new Error(
+        `Cannot send sms unless user_role is Admin - user_role: ${this.user_role}`
+      );
+    } else if (!message || !recipient) {
+      throw new Error(`Cannot send sms required input(s) missing`);
+    } else {
+      const [err, res] = await this.post({
+        url: this.send_sms_uri,
+        jar: this.jar,
+        form: {
+          token: this.token,
+          action: "send",
+          "sms.sendMsg.clientId": "netgear_aircard_rest",
+          "sms.sendMsg.receiver": recipient,
+          "sms.sendMsg.text": message,
+        },
+      });
+      if (err) throw err;
+      if (res.statusCode > 200 && res.statusCode < 400)
+        console.log(
+          `[sms] send ${res.statusCode} ${res.statusMessage} ${res.headers?.location}`
+        );
     }
   };
 
