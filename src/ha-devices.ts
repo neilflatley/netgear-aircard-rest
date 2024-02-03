@@ -67,6 +67,47 @@ export default (json: any) =>
               payload_off: "Battery",
               device_class: "battery_charging",
             },
+            {
+              unique_id: "netgear_aircard_unread_sms",
+              object_id: "netgear_aircard_unread_sms",
+              value_template: "{{ value_json.sms.unreadMsgs > 0 }}",
+              availability: {
+                topic: "netgear_aircard/attribute",
+                value_template: "{{ value_json.sms.ready }}",
+                payload_available: "true",
+              },
+              json_attributes_topic: "netgear_aircard/attribute",
+              json_attributes_template: "{{ value_json.sms | tojson }}",
+            },
+          ],
+          button: [
+            {
+              name: "Restart",
+              unique_id: "netgear_aircard_restart",
+              object_id: "netgear_aircard_restart",
+              availability: {
+                topic: "netgear_aircard/attribute",
+                value_template: "{{ value_json.power.PMState }}",
+                payload_available: "Online",
+              },
+              command_topic: "netgear_aircard/command",
+              payload_press: "restart",
+              device_class: "restart",
+              entity_category: "config",
+            },
+            {
+              name: "Send SMS",
+              unique_id: "netgear_aircard_send_sms",
+              object_id: "netgear_aircard_send_sms",
+              availability: {
+                topic: "netgear_aircard/attribute",
+                value_template: "{{ value_json.sms.sendEnabled }}",
+                payload_available: "true",
+              },
+              command_topic: "netgear_aircard/command",
+              payload_press: "send_sms",
+              icon: "mdi:message-question",
+            },
           ],
           sensor: [
             {
@@ -184,11 +225,28 @@ export default (json: any) =>
               json_attributes_template: "{{ value_json.wwanadv | tojson }}",
             },
           ],
+          text: [
+            {
+              name: "SMS message",
+              unique_id: "netgear_aircard_sms_message",
+              object_id: "netgear_aircard_sms_message",
+              command_topic: "netgear_aircard/sms/message",
+              icon: "mdi:message-text",
+            },
+            {
+              name: "SMS recipient",
+              unique_id: "netgear_aircard_sms_recipient",
+              object_id: "netgear_aircard_sms_recipient",
+              command_topic: "netgear_aircard/sms/recipient",
+              icon: "mdi:message-question",
+            },
+          ],
         }).map(([component, devices]) => [
           component,
           devices.map<Sensor>((d: any) => {
             if (!d.device) d.device = device(json);
-            if (!d.state_topic) d.state_topic = "netgear_aircard/attribute";
+            if (!d.state_topic && !['button','text'].includes(component))
+              d.state_topic = "netgear_aircard/attribute";
             return d;
           }),
         ])

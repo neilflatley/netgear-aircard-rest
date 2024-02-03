@@ -3,6 +3,7 @@ import NetgearRouter from "netgear";
 import request from "request";
 import util from "util";
 import { mqtt } from "./mqtt";
+import { NetgearStatus } from "./netgear";
 import { sleep } from "./util";
 
 const post = util.promisify(request.post);
@@ -11,7 +12,7 @@ const get = util.promisify(request.get);
 // note: options can be passed in here. See login options.
 const router = new NetgearRouter();
 
-class NetgearController {
+class NetgearController implements ISmsController {
   static discovery = async () => {
     let netgear = new NetgearController();
     try {
@@ -38,6 +39,16 @@ class NetgearController {
   private host = "netgear.aircard";
   private password = "MyPassword";
   private routerUri = `http://${this.host}`;
+
+  private message = "";
+  private recipient = "";
+
+  set msg(value: string) {
+    this.message = value;
+  }
+  set to(value: string) {
+    this.recipient = value;
+  }
 
   get status_uri() {
     return `${this.routerUri}/api/model.json?internalapi=1`;
@@ -67,7 +78,7 @@ class NetgearController {
     // requires process.env.MQTT_HOST set otherwise this safely does nothing
     const { status, user_role } = this;
 
-    if (user_role === "Admin" && !mqtt.client) await mqtt.init(status);
+    if (user_role === "Admin" && !mqtt.client) await mqtt.init(status, this);
     if (mqtt.client) await mqtt.publish(JSON.stringify(status));
   };
 
