@@ -1,4 +1,5 @@
 import { to } from "await-to-js";
+import NetgearRouter from "netgear";
 import request from "request";
 import util from "util";
 import { mqtt } from "./mqtt";
@@ -6,7 +7,29 @@ import { mqtt } from "./mqtt";
 const post = util.promisify(request.post);
 const get = util.promisify(request.get);
 
+// note: options can be passed in here. See login options.
+const router = new NetgearRouter();
+
 class NetgearController {
+  static discovery = async () => {
+    let netgear = new NetgearController();
+    try {
+      // discover a netgear router, including IP address. The discovered address will override previous settings
+      const discovered = await router.discover();
+      if (discovered) {
+        netgear = new NetgearController(discovered.host);
+        console.log(discovered);
+        await netgear.refresh();
+        await netgear.login();
+        netgear.publish();
+      }
+    } catch (err: any) {
+      console.log(`Discovery error: ${err} ${err.stack}`);
+    } finally {
+      return netgear;
+    }
+  };
+
   private jar = request.jar(); // Cookie jar
   private get = (arg: Parameters<typeof get>[0]) => to(get(arg));
   private post = (arg: Parameters<typeof post>[0]) => to(post(arg));

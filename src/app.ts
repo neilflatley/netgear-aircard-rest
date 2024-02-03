@@ -1,25 +1,7 @@
 import Fastify, { FastifyInstance } from "fastify";
-import NetgearRouter from "netgear";
 import NetgearController from "./controller.js";
 
-// note: options can be passed in here. See login options.
-const router = new NetgearRouter();
-
-// discover a netgear router, including IP address. The discovered address will override previous settings
-router
-  .discover()
-  .then((discovered) => {
-    netgear = new NetgearController(discovered.host);
-    console.log(discovered);
-    netgear.login().then(() => {
-      netgear.publish();
-    }, (err)=> {
-      console.log(`Discovery error: ${err}`)
-    });
-  })
-  .catch((error) => console.log(error));
-
-let netgear = new NetgearController();
+const netgear = await NetgearController.discovery();
 
 const server: FastifyInstance = Fastify({
   logger: false,
