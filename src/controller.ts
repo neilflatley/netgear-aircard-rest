@@ -19,7 +19,7 @@ class NetgearController {
       if (discovered) {
         netgear = new NetgearController(discovered.host);
         console.log(discovered);
-        await netgear.refresh();
+        await new Promise((r) => setTimeout(r, 5000));
         await netgear.login();
         netgear.publish();
       }
