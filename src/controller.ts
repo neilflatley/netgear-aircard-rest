@@ -3,6 +3,7 @@ import NetgearRouter from "netgear";
 import request from "request";
 import util from "util";
 import { mqtt } from "./mqtt";
+import { sleep } from "./util";
 
 const post = util.promisify(request.post);
 const get = util.promisify(request.get);
@@ -19,7 +20,7 @@ class NetgearController {
       if (discovered) {
         netgear = new NetgearController(discovered.host);
         console.log(discovered);
-        await new Promise((r) => setTimeout(r, 5000));
+        await sleep(3000);
         await netgear.login();
         netgear.publish();
       }

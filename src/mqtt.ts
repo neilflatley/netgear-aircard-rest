@@ -8,13 +8,13 @@ export class Mqtt {
   status: any;
 
   init = async (status: any) => {
+    this.status = status;
     if (!this.client && this.host) {
       const client = await connectAsync(this.host);
 
       if (client) {
         this.client = client;
         console.log(`[mqtt] connected client ${this.host}`);
-        this.status = status;
         this.birth(); // subscribe to ha birth message and republish discovery messages
       }
     }
@@ -23,14 +23,15 @@ export class Mqtt {
 
   birth = () => {
     this.client?.subscribe(`homeassistant/status`);
-    this.client?.on("message", async (t, payload) => {
+    this.client?.on("message", (t, payload) => {
       if (t === `homeassistant/status`) {
         console.log(
           `[mqtt] received payload '${payload}' from homeassistant/status`
         );
-        if (payload.toString() === "online") await this.discovery();
+        if (payload.toString() === "online") this.discovery();
       }
     });
+    this.discovery();
   };
 
   discovery = async (json = this.status) => {
@@ -45,15 +46,15 @@ export class Mqtt {
       }
     }
     if (count) console.log(`[mqtt] published ${count} discovery messages`);
+    this.publish(JSON.stringify(json));
   };
 
   publish = async (message: string, topic = "netgear_aircard/attribute") => {
     if (this.client) {
       await this.client.publishAsync(topic, message);
-      if (this.count % 10 === 0) await this.discovery();
-      this.count++;
+      // if (this.count % 10 === 0) await this.discovery();
+      console.log(`[mqtt] published ${this.count++} status messages since startup`);
     }
-    console.log(`[mqtt] published ${this.count} status messages since startup`);
   };
 }
 
