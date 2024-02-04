@@ -31,25 +31,21 @@ export class Mqtt {
       this.client = undefined;
     });
     // subscribe to ha birth message and republish discovery messages
-    this.client.subscribe([`homeassistant/status`]);
-    this.client.on("message", (t, payload) => {
-      if (t === `homeassistant/status`) {
-        console.log(
-          `[mqtt] received payload '${payload}' from homeassistant/status`
-        );
-        if (payload.toString() === "online") this.discovery();
-      }
-    });
     // subscribe to ha device command topics
-    this.client.subscribe([`netgear_aircard/command`]);
+    this.client.subscribe([`homeassistant/status`, `netgear_aircard/command`]);
+    
     this.client.on("message", (t, buffer) => {
-      if (!this.sms) return;
-      console.log(`[mqtt] received payload '${buffer}' from ${t}`);
       const payload = buffer.toString();
-      const cmd = payload.split("=")[0];
-      const value = payload.split("=")?.[1];
+      console.log(`[mqtt] received payload '${payload}' from ${t}`);
+      
+      if (t === `homeassistant/status` && payload === "online")
+        this.discovery();
 
       if (t === `netgear_aircard/command`) {
+        if (!this.sms) return;
+        const cmd = payload.split("=")[0];
+        const value = payload.split("=")?.[1];
+
         if (cmd === "set_msg") this.sms.msg = value;
         if (cmd === "set_to") this.sms.to = value;
         if (cmd === "send_sms") this.sms.sendSms();
@@ -69,7 +65,10 @@ export class Mqtt {
       for (const device of sensors) {
         await this.publish(
           JSON.stringify(device),
-          `homeassistant/${component}/${device.unique_id.replace('netgear_aircard_', 'netgear_aircard/')}/config`
+          `homeassistant/${component}/${device.unique_id.replace(
+            "netgear_aircard_",
+            "netgear_aircard/"
+          )}/config`
         );
         count++;
       }
