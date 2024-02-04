@@ -141,7 +141,7 @@ export default (json: any) =>
               unique_id: "netgear_aircard_connection_text",
               object_id: "netgear_aircard_connection_text",
               value_template: "{{ value_json.wwan.connectionText }}",
-              icon: "mdi:signal-variant",
+              icon: "mdi:signal-4g",
             },
             {
               name: "Data used",
@@ -152,6 +152,7 @@ export default (json: any) =>
                 "{{ value_json.wwan.dataUsage.generic.dataTransferred }}",
               device_class: "data_size",
               unit_of_measurement: "B",
+              icon: "mdi:counter",
               entity_category: "diagnostic",
             },
             {
@@ -163,13 +164,14 @@ export default (json: any) =>
                 "{{ (value_json.wwan.dataUsage.generic.dataTransferred / 1073741824) | round(3) }}",
               device_class: "data_size",
               unit_of_measurement: "GiB",
+              icon: "mdi:counter",
             },
             {
               name: "Network",
               unique_id: "netgear_aircard_connected_network",
               object_id: "netgear_aircard_connected_network",
               value_template: "{{ value_json.wwan.registerNetworkDisplay }}",
-              icon: "mdi:signal-variant",
+              icon: "mdi:cellphone-text",
             },
             {
               name: "Router",
@@ -190,6 +192,7 @@ export default (json: any) =>
               device_class: "signal_strength",
               unit_of_measurement: "dBm",
               entity_category: "diagnostic",
+              icon: "mdi:signal-distance-variant",
             },
             {
               name: "Service type",
@@ -232,7 +235,7 @@ export default (json: any) =>
               unique_id: "netgear_aircard_wwan_band",
               object_id: "netgear_aircard_wwan_band",
               value_template: "{{ value_json.wwanadv.curBand }}",
-              icon: "mdi:radio-tower",
+              icon: "mdi:signal-variant",
               json_attributes_topic: "netgear_aircard/attribute",
               json_attributes_template: "{{ value_json.wwanadv | tojson }}",
               entity_category: "diagnostic",
