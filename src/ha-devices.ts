@@ -111,7 +111,7 @@ export default (json: any) =>
               },
               command_topic: "netgear_aircard/command",
               command_template:
-                'send_sms={"to":"{{ states(\'text.netgear_aircard_sms_message\') }}","msg":"{{ states(\'text.netgear_aircard_sms_recipient\') }}"}',
+                'send_sms={"msg":"{{ states(\'text.netgear_aircard_sms_message\') }}","to":"{{ states(\'text.netgear_aircard_sms_recipient\') }}"}',
               icon: "mdi:message-plus",
             },
           ],
