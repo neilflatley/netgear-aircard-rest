@@ -1,6 +1,6 @@
 interface ISmsController {
   msg: string;
   to: string;
-  sendSms: () => Promise<void>;
+  sendSms: (opts: { message: string; recipient: string }) => Promise<void>;
   reboot: () => Promise<void>;
 }

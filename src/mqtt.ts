@@ -1,6 +1,6 @@
 import { MqttClient, connectAsync } from "mqtt";
 import devices from "./ha-devices.js";
-import { NetgearStatus } from "./netgear.js";
+import { NetgearStatus } from "./models/netgear.js";
 
 export class Mqtt {
   client?: MqttClient;
@@ -33,11 +33,11 @@ export class Mqtt {
     // subscribe to ha birth message and republish discovery messages
     // subscribe to ha device command topics
     this.client.subscribe([`homeassistant/status`, `netgear_aircard/command`]);
-    
+
     this.client.on("message", (t, buffer) => {
       const payload = buffer.toString();
       console.log(`[mqtt] received payload '${payload}' from ${t}`);
-      
+
       if (t === `homeassistant/status` && payload === "online")
         this.discovery();
 
@@ -48,7 +48,8 @@ export class Mqtt {
 
         if (cmd === "set_msg") this.sms.msg = value;
         if (cmd === "set_to") this.sms.to = value;
-        if (cmd === "send_sms") this.sms.sendSms();
+        if (cmd === "send_sms")
+          this.sms.sendSms({ message: this.sms.msg, recipient: this.sms.to });
         if (cmd === "restart") this.sms.reboot();
       }
     });

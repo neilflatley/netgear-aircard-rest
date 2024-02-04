@@ -3,7 +3,7 @@ import NetgearRouter from "netgear";
 import request from "request";
 import util from "util";
 import { mqtt } from "./mqtt";
-import { NetgearStatus } from "./netgear";
+import { NetgearStatus } from "./models/netgear";
 import { sleep } from "./util";
 
 const post = util.promisify(request.post);
