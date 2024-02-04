@@ -34,7 +34,7 @@ export class Mqtt {
     // subscribe to ha device command topics
     this.client.subscribe([`homeassistant/status`, `netgear_aircard/command`]);
 
-    this.client.on("message", (t, buffer) => {
+    this.client.on("message", async (t, buffer) => {
       const payload = buffer.toString();
       console.log(`[mqtt] received payload '${payload}' from ${t}`);
 
@@ -46,8 +46,14 @@ export class Mqtt {
         const cmd = payload.split("=")[0];
         const value = payload.split("=")?.[1];
 
-        if (cmd === "set_msg") this.sms.msg = value;
-        if (cmd === "set_to") this.sms.to = value;
+        if (cmd === "set_msg") {
+          this.sms.msg = value;
+          await this.publish(this.sms.msg, `netgear_aircard/sms/message`);
+        }
+        if (cmd === "set_to") {
+          this.sms.to = value;
+          await this.publish(this.sms.to, `netgear_aircard/sms/recipient`);
+        }
         if (cmd === "send_sms")
           this.sms.sendSms({ message: this.sms.msg, recipient: this.sms.to });
         if (cmd === "restart") this.sms.reboot();

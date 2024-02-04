@@ -40,18 +40,22 @@ class NetgearController implements ISmsController {
   private password = "MyPassword";
   private routerUri = `http://${this.host}`;
 
-  private message = "";
-  private recipient = "";
+  private message?: string;
+  private recipient?: string;
 
   get msg() {
-    return this.message || this.status.sms.sendMsg?.[0].text || "";
+    return typeof this.message === "string"
+      ? this.message
+      : this.status.sms.sendMsg?.[0].text || "";
   }
   set msg(value: string) {
     this.message = value;
   }
 
   get to() {
-    return this.recipient || this.status.sms.sendMsg?.[0].receiver || "";
+    return typeof this.recipient === "string"
+      ? this.recipient
+      : this.status.sms.sendMsg?.[0].receiver || "";
   }
   set to(value: string) {
     this.recipient = value;
