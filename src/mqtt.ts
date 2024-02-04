@@ -54,8 +54,10 @@ export class Mqtt {
           this.sms.to = value;
           await this.publish(this.sms.to, `netgear_aircard/sms/recipient`);
         }
-        if (cmd === "send_sms")
-          this.sms.sendSms({ message: this.sms.msg, recipient: this.sms.to });
+        if (cmd === "send_sms") {
+          const json = JSON.parse(value);
+          this.sms.sendSms({ message: json.msg, recipient: json.to });
+        }
         if (cmd === "restart") this.sms.reboot();
       }
     });
@@ -63,8 +65,10 @@ export class Mqtt {
 
   discovery = async (json = this.status) => {
     // publish ha status topics
-    await this.publish(this.sms.to, `netgear_aircard/sms/recipient`);
-    await this.publish(this.sms.msg, `netgear_aircard/sms/message`);
+    this.sms.to &&
+      (await this.publish(this.sms.to, `netgear_aircard/sms/recipient`));
+    this.sms.msg &&
+      (await this.publish(this.sms.msg, `netgear_aircard/sms/message`));
 
     // publish mqtt discovery devices
     let count = 0;

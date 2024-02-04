@@ -110,7 +110,8 @@ export default (json: any) =>
                 payload_available: true,
               },
               command_topic: "netgear_aircard/command",
-              payload_press: "send_sms",
+              command_template:
+                'send_sms={"to":"{{ states(\'text.netgear_aircard_sms_message\') }}","msg":"{{ states(\'text.netgear_aircard_sms_recipient\') }}"}',
               icon: "mdi:message-plus",
             },
           ],
@@ -243,8 +244,8 @@ export default (json: any) =>
               unique_id: "netgear_aircard_sms_message",
               object_id: "netgear_aircard_sms_message",
               command_topic: "netgear_aircard/command",
-              command_template:"set_msg={{ value }}",
-              state_topic : "netgear_aircard/sms/message",
+              command_template: "set_msg={{ value }}",
+              state_topic: "netgear_aircard/sms/message",
               icon: "mdi:message-text",
             },
             {
@@ -252,8 +253,8 @@ export default (json: any) =>
               unique_id: "netgear_aircard_sms_recipient",
               object_id: "netgear_aircard_sms_recipient",
               command_topic: "netgear_aircard/command",
-              command_template:"set_to={{ value }}",
-              state_topic : "netgear_aircard/sms/recipient",
+              command_template: "set_to={{ value }}",
+              state_topic: "netgear_aircard/sms/recipient",
               icon: "mdi:message-question",
             },
           ],
@@ -261,7 +262,7 @@ export default (json: any) =>
           component,
           devices.map<Sensor>((d: any) => {
             if (!d.device) d.device = device(json);
-            if (!d.state_topic && !['button','text'].includes(component))
+            if (!d.state_topic && !["button", "text"].includes(component))
               d.state_topic = "netgear_aircard/attribute";
             return d;
           }),
