@@ -41,28 +41,19 @@ export class Mqtt {
       }
     });
     // subscribe to ha device command topics
-    this.client.subscribe([
-      `netgear_aircard/command`,
-      `netgear_aircard/sms/recipient`,
-      `netgear_aircard/sms/message`,
-    ]);
-    this.client.on("message", (t, payload) => {
+    this.client.subscribe([`netgear_aircard/command`]);
+    this.client.on("message", (t, buffer) => {
       if (!this.sms) return;
-      if (t === `netgear_aircard/sms/recipient`) {
-        console.log(
-          `[mqtt] received payload '${payload}' from homeassistant/sms/recipient`
-        );
-        this.sms.to = payload.toString();
-      }
-      if (t === `netgear_aircard/sms/message`) {
-        console.log(
-          `[mqtt] received payload '${payload}' from homeassistant/sms/message`
-        );
-        this.sms.msg = payload.toString();
-      }
+      console.log(`[mqtt] received payload '${buffer}' from ${t}`);
+      const payload = buffer.toString();
+      const cmd = payload.split("=")[0];
+      const value = payload.split("=")?.[1];
+
       if (t === `netgear_aircard/command`) {
-        if (payload.toString() === "send_sms") this.sms.sendSms();
-        if (payload.toString() === "restart") this.sms.reboot();
+        if (cmd === "set_msg") this.sms.msg = value;
+        if (cmd === "set_to") this.sms.to = value;
+        if (cmd === "send_sms") this.sms.sendSms();
+        if (cmd === "restart") this.sms.reboot();
       }
     });
   };
@@ -78,7 +69,7 @@ export class Mqtt {
       for (const device of sensors) {
         await this.publish(
           JSON.stringify(device),
-          `homeassistant/${component}/netgear_aircard/${device.unique_id}/config`
+          `homeassistant/${component}/${device.unique_id.replace('netgear_aircard_', 'netgear_aircard/')}/config`
         );
         count++;
       }
@@ -92,10 +83,10 @@ export class Mqtt {
   publish = async (message: string, topic = "netgear_aircard/attribute") => {
     if (this.client) {
       await this.client.publishAsync(topic, message);
-      // if (this.count % 10 === 0) await this.discovery();
-      console.log(
-        `[mqtt] published ${++this.count} status messages since startup`
-      );
+      if (topic === "netgear_aircard/attribute")
+        console.log(
+          `[mqtt] published ${++this.count} status messages since startup`
+        );
     }
   };
 }
